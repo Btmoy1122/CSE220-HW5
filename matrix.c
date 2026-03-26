@@ -3,8 +3,8 @@
  * Homework 5 – Pointer Operations
  * CSE 220 – Spring 2026
  *
- * Name:
- * SBU ID:
+ * Name: Brandon Moy
+ * SBU ID: 116187802
  */
 
 #include "matrix.h"
@@ -24,13 +24,37 @@ int SparseMatrix(int D[2], int M[D[0]][D[1]],
                  int S[3][(D[1] > D[0] ? D[1] : D[0])])
 {
 
-    int rows = D[0];
-    int cols = D[1];
+    int rows = *(D);
+    int cols = *(D + 1);
     int m = max(rows, cols);
 
     int nonZeroCount = 0;
 
-    return 0;
+    for (int r = 0; r < 3; r++){
+      for (int c = 0; c < m; c++){
+        *(*(S + r) + c) = 0;
+      }
+    }
+
+    for (int i = 0; i < rows; i++){
+      for (int j = 0; j<cols; j++){
+        int cur = *(*(M + i) + j);
+        if (cur!=0){
+          if (nonZeroCount < m){
+            *(*(S) + nonZeroCount) = i;
+            *(*(S + 1) + nonZeroCount) = j;
+            *(*(S + 2) + nonZeroCount) = cur;
+          }
+          nonZeroCount++;
+        }
+      }
+    }
+
+    if (nonZeroCount > m){
+      return -1;
+    }
+
+    return nonZeroCount;
 }
 
 
