@@ -67,18 +67,42 @@ int HadamardProduct(const int D[6],
                     int A[D[4]][D[5]])
 {
 
-    int mRows = D[0];
-    int mCols = D[1];
+    int mRows = *(D);
+    int mCols = *(D+1);
 
-    int nRows = D[2];
-    int nCols = D[3];
+    int nRows = *(D+2);
+    int nCols = *(D+3);
 
-    int aRows = D[4];
-    int aCols = D[5];
+    int aRows = *(D+4);
+    int aCols = *(D+5);
 
+    for (int i = 0; i < aRows; i++){
+      for (int j = 0; j < aCols; j++){
+        *(*(A+i)+j) = 0;
+      }
+    }
 
-    return 0;
+    int iRows = (mRows < nRows) ? mRows : nRows;
+    int iCols = (mCols < nCols) ? mCols : nols;
+
+    for (int i = 0; i < iRows; i++) {
+        for (int j = 0; j < iCols; j++) {
+            if (i < aRows && j < aCols) {
+                *(*(A + i) + j) = (*(*(M + i) + j)) * (*(*(N + i) + j));
+            }
+        }
+    }
+
+    if (mRows == nRows && mCols == nCols) {
+        if (aRows == mRows && aCols == mCols) return 1;    
+        if (aRows >= mRows && aCols >= mCols) return 2;    
+        return -3;                            
+    } else { 
+        if (aRows >= iRows && aCols >= iCols) return -1;   
+        return -2;                              
+    }
 }
+
 
 
 /*----------------------------------------------------
