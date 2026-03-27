@@ -114,17 +114,44 @@ int Multiplication(const int D[6],
                    int A[D[4]][D[5]])
 {
 
-    int mRows = D[0];
-    int mCols = D[1];
+    int mRows = *(D);
+    int mCols = *(D+1);
 
-    int nRows = D[2];
-    int nCols = D[3];
+    int nRows = *(D+2);
+    int nCols = *(D+3);
 
-    int aRows = D[4];
-    int aCols = D[5];
+    int aRows = *(D+4);
+    int aCols = *(D+5);
 
+    for (int i = 0;i < aRows; i++){
+      for (int j = 0; j<aCols; j++){
+        *(*(A+i)+j) = 0;
+      }
+    }
 
-    return 0;
+    int limit = (mCols < nRows) ? mC: nR;
+
+    for (int i = 0; i < mRows; i++){
+      for (int j = 0; j < nCols; j++){
+        if (i < aRows && j < nCols){
+          int sum = 0;
+          for (int k = 0; k < limit; k++){
+            sum +=(*(*(M + i) + k)) * (*(*(N+k) + i));
+          }
+          *(*(A + i) +j) = sum;
+        }
+      }
+    }
+
+    if (mCols == nRows) {
+      if (aRows == mRows && aCols == nCols) return 1;
+      if (aRows >= mRows && aCols >= nCols) return 2;
+      return -3;
+    } else {
+      if (aRows >= mRows && aCols >= nCols) return -1;
+      return -2;
+    }
+    
 }
 
 

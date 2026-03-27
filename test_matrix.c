@@ -205,26 +205,103 @@ Test(HadamardProduct, rectangular_intersection) {
 
 //=======================================================================================================================================================
 
-Test(Multiplication, simple_case)
-{
-    int D[6] = {2,2,2,2,2,2};
-
-    int M[2][2] = {
-        {1,2},
-        {3,4}
-    };
-
-    int N[2][2] = {
-        {5,6},
-        {7,8}
-    };
-
+// 1. Compatible: Perfect Fit (Return 1)
+Test(Multiplication, perfect_fit) {
+    int D[6] = {2, 2, 2, 2, 2, 2};
+    int M[2][2] = {{1, 2}, {3, 4}};
+    int N[2][2] = {{5, 6}, {7, 8}};
     int A[2][2];
-
-    int r = Multiplication(D,M,N,A);
-
-    cr_assert_eq(r,1);
+    cr_assert_eq(Multiplication(D, M, N, A), 1);
+    cr_assert_eq(*(*(A+0)+0), 19); // (1*5 + 2*7)
 }
+
+// 2. Compatible: Oversized A (Return 2) [cite: 281]
+Test(Multiplication, oversized_A) {
+    int D[6] = {2, 2, 2, 2, 4, 4};
+    int M[2][2] = {{1, 0}, {0, 1}};
+    int N[2][2] = {{5, 5}, {5, 5}};
+    int A[4][4];
+    cr_assert_eq(Multiplication(D, M, N, A), 2);
+}
+
+// 3. Compatible: Undersized A (Return -3) [cite: 283]
+Test(Multiplication, undersized_A_compatible) {
+    int D[6] = {3, 2, 2, 3, 2, 4}; // Result should be 3x3, A is 2x4
+    int M[3][2] = {{1, 1}, {1, 1}, {1, 1}};
+    int N[2][3] = {{1, 1, 1}, {1, 1, 1}};
+    int A[2][4];
+    cr_assert_eq(Multiplication(D, M, N, A), -3);
+}
+
+// 4. Incompatible: A fits partial result (Return -1) [cite: 276]
+Test(Multiplication, incompatible_A_fits) {
+    int D[6] = {3, 2, 3, 2, 4, 3}; // mC=2, nR=3 (Incomp), Result 3x2, A is 4x3
+    int M[3][2] = {{1, 1}, {1, 1}, {1, 1}};
+    int N[3][2] = {{2, 2}, {2, 2}, {2, 2}};
+    int A[4][3];
+    cr_assert_eq(Multiplication(D, M, N, A), -1);
+}
+
+// 5. Incompatible: A too small for partial result (Return -2) [cite: 219]
+Test(Multiplication, incompatible_A_small) {
+    int D[6] = {3, 2, 3, 2, 2, 2}; // Result 3x2, A is 2x2
+    int M[3][2] = {{1, 1}, {1, 1}, {1, 1}};
+    int N[3][2] = {{2, 2}, {2, 2}, {2, 2}};
+    int A[2][2];
+    cr_assert_eq(Multiplication(D, M, N, A), -2);
+}
+
+// 6. Edge Case: 1x1 Identity
+Test(Multiplication, identity_1x1) {
+    int D[6] = {1, 1, 1, 1, 1, 1};
+    int M[1][1] = {{10}};
+    int N[1][1] = {{2}};
+    int A[1][1];
+    Multiplication(D, M, N, A);
+    cr_assert_eq(*(*(A+0)+0), 20);
+}
+
+// 7. Edge Case: Rectangular compatible
+Test(Multiplication, rectangular_comp) {
+    int D[6] = {1, 3, 3, 1, 1, 1}; // 1x3 * 3x1 -> 1x1
+    int M[1][3] = {{1, 2, 3}};
+    int N[3][1] = {{1}, {1}, {1}};
+    int A[1][1];
+    Multiplication(D, M, N, A);
+    cr_assert_eq(*(*(A+0)+0), 6);
+}
+
+// 8. Edge Case: Zero Matrix multiplication
+Test(Multiplication, zero_matrix) {
+    int D[6] = {2, 2, 2, 2, 2, 2};
+    int M[2][2] = {{0, 0}, {0, 0}};
+    int N[2][2] = {{9, 9}, {9, 9}};
+    int A[2][2];
+    Multiplication(D, M, N, A);
+    cr_assert_eq(*(*(A+1)+1), 0);
+}
+
+// 9. Edge Case: Negative results
+Test(Multiplication, negative_results) {
+    int D[6] = {1, 2, 2, 1, 1, 1};
+    int M[1][2] = {{2, -2}};
+    int N[2][1] = {{5}, {10}};
+    int A[1][1];
+    Multiplication(D, M, N, A);
+    cr_assert_eq(*(*(A+0)+0), -10); // (10 - 20)
+}
+
+// 10. Large Dimension Boundary
+Test(Multiplication, dimension_boundary) {
+    int D[6] = {5, 1, 1, 5, 5, 5}; // 5x1 * 1x5 -> 5x5
+    int M[5][1] = {{1}, {1}, {1}, {1}, {1}};
+    int N[1][5] = {{2, 2, 2, 2, 2}};
+    int A[5][5];
+    cr_assert_eq(Multiplication(D, M, N, A), 1);
+    cr_assert_eq(*(*(A+4)+4), 2);
+}
+
+//======================================================================================================================================================================
 
 Test(DiagonalSum, square_matrix)
 {
