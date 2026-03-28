@@ -30,12 +30,14 @@ int SparseMatrix(int D[2], int M[D[0]][D[1]],
 
     int nonZeroCount = 0;
 
+    //Initialize with zeros
     for (int r = 0; r < 3; r++){
       for (int c = 0; c < m; c++){
         *(*(S + r) + c) = 0;
       }
     }
 
+    //Logic
     for (int i = 0; i < rows; i++){
       for (int j = 0; j<cols; j++){
         int cur = *(*(M + i) + j);
@@ -76,14 +78,16 @@ int HadamardProduct(const int D[6],
     int aRows = *(D+4);
     int aCols = *(D+5);
 
+    //Iniatilization
     for (int i = 0; i < aRows; i++){
       for (int j = 0; j < aCols; j++){
         *(*(A+i)+j) = 0;
       }
     }
 
+    //Logic
     int iRows = (mRows < nRows) ? mRows : nRows;
-    int iCols = (mCols < nCols) ? mCols : nols;
+    int iCols = (mCols < nCols) ? mCols : nCols;
 
     for (int i = 0; i < iRows; i++) {
         for (int j = 0; j < iCols; j++) {
@@ -123,20 +127,23 @@ int Multiplication(const int D[6],
     int aRows = *(D+4);
     int aCols = *(D+5);
 
+    //Initialization
     for (int i = 0;i < aRows; i++){
       for (int j = 0; j<aCols; j++){
         *(*(A+i)+j) = 0;
       }
     }
 
-    int limit = (mCols < nRows) ? mC: nR;
+
+    //Logic
+    int limit = (mCols < nRows) ? mCols: nRows;
 
     for (int i = 0; i < mRows; i++){
       for (int j = 0; j < nCols; j++){
-        if (i < aRows && j < nCols){
+        if (i < aRows && j < aCols){
           int sum = 0;
           for (int k = 0; k < limit; k++){
-            sum +=(*(*(M + i) + k)) * (*(*(N+k) + i));
+            sum +=(*(*(M + i) + k)) * (*(*(N+k) + j));
           }
           *(*(A + i) +j) = sum;
         }
@@ -163,12 +170,44 @@ int DiagonalSum(const int D[4],
                 int DS[D[2]][D[3]])
 {
 
-    int rows = D[0];
-    int cols = D[1];
+    int rows = *(D);
+    int cols = *(D+1);
 
-    int dsRows = D[2];
-    int dsCols = D[3];
+    int dsRows = *(D+2);
+    int dsCols = *(D+3);
 
+    //Initialization
+    for (int i = 0; i < dsRows; i++){
+      for (int j = 0; j < dsCols; j++){
+        *(*(DS + i) + j) = 0;
+      }
+    }
 
-    return 0;
+    //Logic
+
+    for (int i = 0; i < rows; i++){
+      for (int j = 0; j < cols; j++){
+        int value = *(*(A + i) + j);
+        if (i + 2 < dsRows && 0 < dsCols){
+          *(*(DS + i + 2) + 0) += value;
+        }
+        if (dsRows > 1 && j < dsCols){
+          *(*(DS + 1) + j) +=value;
+        }
+        if (i == j && dsRows > 0 && dsCols > 0){
+          *(*(DS + 0) + 0) += value;
+        }
+        if (rows == cols && (i + j == rows-1) && dsRows > 0 && dsCols >1){
+          *(*(DS + 0) + 1) += value;
+        }
+      }
+      
+    }
+    int minReqRows = rows + 2;
+    int minReqCols = (cols > 2) ? cols: 2;
+
+    if (dsRows == minReqRows && dsCols == minReqCols) return 1;
+    if (dsRows >= minReqRows && dsCols >= minReqCols) return 2;
+    return -1;
+
 }
